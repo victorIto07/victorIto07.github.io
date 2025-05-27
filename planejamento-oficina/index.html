@@ -88,6 +88,7 @@
 
     #content-box-header {
       width: 100%;
+      height: 35px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -100,10 +101,10 @@
       color: var(--background-color);
       cursor: pointer;
 
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       font-weight: bold;
 
-      height: 35px;
+      height: 100%;
 
       padding: .3rem;
     }
@@ -115,18 +116,17 @@
       color: var(--background-color);
       cursor: pointer;
 
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       font-weight: bold;
 
-      height: 35px;
+      height: 100%;
 
       padding: .3rem;
     }
 
     .my-square {
-      width: 35px;
-      height: 35px;
-
+      height: 100%;
+      aspect-ratio: 1;
       margin-right: 10px;
       position: relative;
       border-radius: 3px;
@@ -154,18 +154,33 @@
       font-size: 16px;
       font-weight: bold;
       font-family: monospace;
+      height: 100%;
     }
 
     .colors {
       display: flex;
       gap: 30px;
       justify-content: center;
+      height: 100%;
     }
 
-    @media (max-width: 1700px) {
+    @media (max-width: 1650px) {
       .colors {
         display: none;
       }
+
+      #content-box-header {
+        align-items: start;
+        flex-direction: column;
+        height: auto;
+        gap: 30px;
+      }
+
+
+      #content-box-header>* {
+        height: 7vh;
+      }
+
     }
   </style>
 </head>
