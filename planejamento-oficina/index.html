@@ -7,6 +7,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/planejamento-oficina/assets/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/planejamento-oficina/assets/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/planejamento-oficina/assets/favicon-16x16.png">
+  <link rel="icon" type="image/x-icon" sizes="64x64" href="/planejamento-oficina/assets/favicon.ico">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,6 +47,7 @@
       min-width: 300px;
       display: flex;
       flex-direction: column;
+      position: relative;
     }
 
     #input-box>textarea {
@@ -83,7 +85,6 @@
       height: 100%;
     }
 
-
     #theme {
       display: block;
       position: absolute;
@@ -100,6 +101,25 @@
 
       padding: .3rem;
     }
+
+    #deps {
+      display: block;
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 10000000000000;
+
+      background-color: var(--color);
+      color: var(--background-color);
+      cursor: pointer;
+
+      font-size: 1.2rem;
+      font-weight: bold;
+
+      padding: .3rem;
+
+      transform: translateX(100%);
+    }
   </style>
 </head>
 
@@ -108,6 +128,7 @@
 
   <div id="main">
     <div id="input-box">
+      <button id="deps"></button>
       <textarea id="input"></textarea>
       <div class="input-footer">
         <button id="submit">Aplicar</button>
@@ -388,7 +409,6 @@
 `;
   </script>
 
-
   <!-- Deal with DOM -->
   <script type="text/javascript">
     var network = null;
@@ -408,6 +428,11 @@
     const theme_button = document.getElementById('theme');
     theme_button.addEventListener('click', () => {
       toggleTheme();
+    });
+
+    const deps_button = document.getElementById('deps');
+    deps_button.addEventListener('click', () => {
+      toggleDeps();
     });
   </script>
 
@@ -441,7 +466,20 @@
     }
   </script>
 
-  <!-- Parsing the YAML -->
+  <!-- Handle Deps -->
+  <script type="text/javascript">
+    var VAR_DEPS = false;
+
+    function toggleDeps() {
+      VAR_DEPS = !VAR_DEPS;
+
+      deps_button.innerText = VAR_DEPS ? 'esconder dependências' : 'mostrar dependências';
+
+      applyYaml();
+    }
+  </script>
+
+  <!-- Parsing YAML -->
   <script type="text/javascript">
     function parseYamlToObject(yaml, finalName) {
       var rawItems = parseSimpleYaml(yaml);
@@ -521,7 +559,7 @@
     }
   </script>
 
-  <!-- Transforming obj into network data -->
+  <!-- Transforming final object into network data -->
   <script type="text/javascript">
     function setDeps(item, nodes, edges, cache) {
       var _a;
@@ -613,8 +651,7 @@
         return {nodes: nodes, edges: edges};
       }
       var _a = transformTreeToVisData(new Map(), final, [], []), nodes = _a.nodes, edges = _a.edges;
-      var set_deps = true;
-      if (set_deps) {
+      if (VAR_DEPS) {
         setDeps(final, nodes, edges, new Map());
         for (var _i = 0, nodes_1 = nodes; _i < nodes_1.length; _i++) {
           var node = nodes_1[_i];
@@ -673,7 +710,7 @@
 
   <!-- Auto Run -->
   <script type="text/javascript">
-    applyYaml();
+    toggleDeps();
   </script>
 </body>
 
