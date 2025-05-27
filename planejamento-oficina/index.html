@@ -1,338 +1,679 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Visualização de YAML de Planejamento</title>
 
   <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
-  <title></title>
-  <style>
-    #mynetwork {
-      width: 100dvw;
-      height: calc(100dvh - 80px);
+  <link rel="apple-touch-icon" sizes="180x180" href="/planejamento-oficina/assets/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/planejamento-oficina/assets/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/planejamento-oficina/assets/favicon-16x16.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:ital,wght@0,200..800;1,200..800&display=swap"
+    rel="stylesheet">
+
+  <style type="text/css">
+    * {
+      min-width: 0;
+      min-height: 0;
+      margin: 0;
+      padding: 0;
+
+      font-family: "Atkinson Hyperlegible Mono", sans-serif;
+      font-optical-sizing: auto;
+      font-style: normal;
+
+      border: none;
+      outline: none;
+
+      background-color: var(--background-color);
+      color: var(--color);
+
+      transition: all .3s ease-in-out;
     }
 
-    .square {
-      width: 30px;
-      height: 30px;
-      margin-right: 10px;
-      position: relative;
-      border-radius: 3px;
-    }
-
-    .square::before {
-      content: '';
-      position: absolute;
-      left: 0px;
-      top: 0px;
-      width: 22px;
-      height: 22px;
-      border: 4px solid #0004;
-      border-radius: 3px;
-    }
-
-    .item {
+    #main {
+      width: 100vw;
+      height: 100vh;
       display: flex;
-      align-items: center;
-      font-size: 24px;
-      font-weight: bold;
-      font-family: monospace;
+      overflow: hidden;
     }
 
-    .colors {
+    #input-box {
+      width: 33.34%;
+      min-width: 300px;
       display: flex;
-      justify-content: center;
-      gap: 30px;
+      flex-direction: column;
+    }
+
+    #input-box>textarea {
+      width: 100%;
+      height: 100%;
+      display: block;
+      resize: none;
+
+      border: solid 1px var(--color);
+    }
+
+    #input-box>.input-footer {
+      width: 100%;
       height: 40px;
+
+      #submit {
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    #input-box>.input-footer>#submit {
+      width: 100%;
+      height: 100%;
+      font-weight: bold;
+      font-size: 1.2rem;
+      cursor: pointer;
+
+      background-color: var(--color);
+      color: var(--background-color);
+    }
+
+    #mynetwork {
+      width: 100%;
+      height: 100%;
+    }
+
+
+    #theme {
+      display: block;
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 10000000000000;
+
+      background-color: var(--color);
+      color: var(--background-color);
+      cursor: pointer;
+
+      font-size: 1.2rem;
+      font-weight: bold;
+
+      padding: .3rem;
     }
   </style>
 </head>
 
 <body>
+  <button id="theme"></button>
 
-  <div class="colors">
-    <div class="item">
-      <div class="square" style="background-color:#9366ff"></div>
-      todo
+  <div id="main">
+    <div id="input-box">
+      <textarea id="input"></textarea>
+      <div class="input-footer">
+        <button id="submit">Aplicar</button>
+      </div>
     </div>
-    <div class="item">
-      <div class="square" style="background-color: #ff6686"></div>
-      necessário
-    </div>
-    <div class="item">
-      <div class="square" style="background-color: #ff9366"></div>
-      importante
-    </div>
-    <div class="item">
-      <div class="square" style="background-color: #ffe066"></div>
-      pode esperar
-    </div>
-    <div class="item">
-      <div class="square" style="background-color: #66ff93"></div>
-      opcional
-    </div>
-    <div class="item">
-      <div class="square" style="background-color: #D8D8D8"></div>
-      dependência
-    </div>
+    <div id="mynetwork"></div>
   </div>
 
-  <div id="mynetwork"></div>
+  <!-- Default YAML -->
+  <script type="text/javascript">
+    const default_yaml = `
+# -------- Item final que deve ser populado --------
+# Todos os itens que não estão aqui serão ignorados
 
-  <script>
-    var materiais = {
-      name: 'Materiais', children: [
-        {name: 'Disciplinas'},
-        {name: 'Aulas'},
-        {name: 'Tópicos'},
-        {name: 'Leis'},
-      ], prio: 0
-    };
-    var areas = {
-      name: 'Áreas',
-      children: [{name: 'Objetivos'}],
-      deps: [materiais],
-      prio: 0
-    };
-    var simulados = {
-      name: 'Simulados',
-      children: [{name: 'Questões'}],
-      deps: [areas],
-      prio: 0
-    };
-    var discursivas = {
-      name: 'Discursivas',
-      children: [{name: 'Correção'}],
-      deps: [areas],
-      prio: 0
-    };
-    var flashcards = {
-      name: 'Flashcards',
-      children: [{name: 'Cards'}],
-      deps: [areas],
-      prio: 0
-    };
-    var permissoes = {
-      name: 'Permissões',
-      prio: 0,
-    };
-    var feedbacks = {
-      name: 'Feedbacks',
-      children: [{name: 'Aprovação'}],
-      deps: [areas, simulados, discursivas],
-      prio: 0,
-    };
-    var turmas = {
-      name: 'Turmas',
-      deps: [permissoes],
-      prio: 0,
-    };
-    var produtos = {name: 'Produtos', prio: 2};
-    var vendas = {name: 'vendas', deps: [produtos], prio: 2};
-    var pagamentos = {name: 'pagamentos', deps: [vendas], prio: 2};
-    var aluno_debito = {name: 'alunos em débito', children: [{name: 'por turma'}], deps: [pagamentos], prio: 2};
-    var conteudo_estudo = {
-      name: 'Conteúdo de estudo',
-      children: [
-        areas,
-        simulados,
-        discursivas,
-        flashcards,
-        materiais,
-        {
-          name: 'Cursos',
-          deps: [areas, permissoes],
-          prio: 1,
-        },
-        {
-          name: 'Livros digitais',
-          deps: [areas],
-          prio: 2,
-        },
-        {
-          name: 'Vídeos',
-          deps: [areas],
-          prio: 2,
-        },
-        {name: 'Bancas', prio: 3},
-        {name: 'Mapas mentais', prio: 3},
-      ]
-    };
-    var interacao_usuario = {
-      name: 'Interação com usuário',
-      children: [
-        feedbacks,
-        permissoes,
-        turmas,
-        {name: 'Relatório mensal', deps: [feedbacks], prio: 0},
-        {name: 'Contratos', children: [{name: 'Aprovação'}], deps: [permissoes], prio: 1},
-        {name: 'Dashboard', children: [{name: 'Feedbacks'}], prio: 1},
-        {
-          name: 'Eventos',
-          children: [{name: 'Encontros'}],
-          deps: [turmas, permissoes],
-          prio: 2,
-        },
-        {
-          name: 'Campanhas',
-          children: [{name: 'Inscrições'}],
-          prio: 2,
-        },
-        {name: 'Roda da vida', prio: 2},
-        {name: 'Triade do tempo', prio: 2},
-        {name: 'Teste atenção', prio: 2},
-      ],
-    };
-    var suporte = {
-      name: 'Suporte',
-      children: [
-        {name: 'fale conosco', prio: 1},
-        {name: 'problemas', prio: 1},
-        {name: 'comentários', prio: 2},
-      ],
-    };
-    var marketing = {
-      name: 'Marketing',
-      children: [
-        produtos,
-        vendas,
-        pagamentos,
-        aluno_debito,
-      ],
-    };
-    var outros = {
-      name: 'Outros',
-      children: [
-        {name: 'Links', children: [{name: 'Acessos'}], prio: 3},
-        {name: 'arquivos', prio: 1},
-        {name: 'Envio de email', children: [{name: 'Templates'}, {name: 'Blacklist'}], prio: 1},
-      ],
-    };
-    var stuff = {
-      name: 'todo', children: [
-        conteudo_estudo,
-        interacao_usuario,
-        suporte,
-        marketing,
-        outros,
-      ],
-      prio: -1
-    };
-    function toColor(node) {
-      switch (node.prio) {
-        case -1:
-          return '#9366ff';
-        case 0:
-          return '#ff6686';
-        case 1:
-          return '#ff9366';
-        case 2:
-          return '#ffe066';
-        case 3:
-          return '#66ff93';
-      }
+- label: Final
+  prio: -1
+  children:
+    - Conteúdo de Estudo
+    - Interação Usuário
+    - Suporte
+    - Marketing
+    - Outros
 
-      if (node.children && node.children.length > 0) {
-        return '#66d2ff';
-      }
+# -------- Conteúdo de estudo --------
+- label: Conteúdo de Estudo
+  children:
+    - Metas
+    - Anotações
+    - Áreas
+    - Simulados
+    - Discursivas
+    - Flashcards
+    - Materiais
+    - Cursos
+    - Livros Digitais
+    - Vídeos
+    - Bancas
+    - Mapas Mentais
+
+- label: Metas
+  prio: 0
+  deps:
+    - Materiais
+
+- label: Anotações
+  prio: 0
+  deps:
+    - Metas
+    - Áreas
+
+- label: Áreas
+  prio: 0
+  deps:
+    - Materiais
+  children:
+    - Objetivos
+
+- label: Simulados
+  prio: 0
+  deps:
+    - Áreas
+  children:
+    - Questões
+    - Ranking
+    - Créditos
+
+- label: Discursivas
+  prio: 0
+  deps:
+    - Áreas
+  children:
+    - Correção de Discursiva
+    - Ranking
+    - Créditos
+
+- label: Flashcards
+  prio: 0
+  children:
+    - Cards
+  deps:
+    - Áreas
+    - Créditos
+
+- label: Materiais
+  prio: 0
+  children:
+    - Disciplinas
+    - Aulas
+    - Tópicos
+    - Leis
+
+- label: Cursos
+  prio: 1
+  deps:
+    - Áreas
+    - Permissões
+
+- label: Livros Digitais
+  prio: 2
+  deps:
+    - Áreas
+
+- label: Vídeos
+  prio: 2
+  deps:
+    - Áreas
+
+- label: Bancas
+  prio: 3
+
+- label: Mapas Mentais
+  prio: 3
+
+- label: Ranking
+  prio: 2
+
+# -------- Interação Usuário --------
+- label: Interação Usuário
+  children:
+    - Feedbacks
+    - Dashboard
+    - Eventos
+    - Motivação
+    - Turmas
+    - Relatório Mensal
+    - Roda da Vida
+    - Triade do Tempo
+    - Teste de Atenção
+    - Configuração do Usuário
+
+- label: Feedbacks
+  prio: 0
+  children:
+    - Aprovação
+  deps:
+    - Áreas
+    - Metas
+    - Questões
+    - Discursivas
+    - Cards
+
+- label: Dashboard
+  prio: 1
+  deps:
+    - Feedbacks
+
+- label: Eventos
+  prio: 2
+  children:
+    - Encontros
+  deps:
+    - Turmas
+    - Permissões
+
+- label: Motivação
+  prio: 1
+  deps:
+    - Metas
+    - Feedbacks
+
+- label: Turmas
+  prio: 0
+  deps:
+    - Permissões
+
+- label: Relatório Mensal
+  prio: 0
+  deps:
+    - Feedbacks
+
+- label: Roda da Vida
+  prio: 2
+
+- label: Triade do Tempo
+  prio: 2
+
+- label: Teste de Atenção
+  prio: 2
+
+- label: Configuração do Usuário
+  prio: 1
+  children:
+    # (pode ser definido por instituição)
+    - Definição do Avatar
+    - Tema
+
+- label: Definição do Avatar
+  prio: 2
+
+# -------- Suporte --------
+- label: Suporte
+  children:
+    - Fale Conosco
+    - Problemas
+    - Comentários
+
+- label: Fale Conosco
+  prio: 1
+
+- label: Problemas
+  prio: 1
+
+- label: Comentários
+  prio: 2
+
+
+# -------- Marketing --------
+- label: Marketing
+  children:
+    - Produtos
+    - Vendas
+    - Pagamentos
+    - Alunos em Débito
+    - Campanhas
+    - Créditos
+
+- label: Produtos
+  prio: 2
+
+- label: Vendas
+  prio: 2
+  deps:
+    - Produtos
+
+- label: Pagamentos
+  prio: 2
+  deps:
+    - Vendas
+
+- label: Alunos em Débito
+  prio: 2
+  children:
+    - Por turma
+  deps:
+    - Pagamentos
+
+- label: Campanhas
+  prio: 2
+  children:
+    - Inscrições
+
+- label: Créditos
+  prio: 2
+  deps:
+    - Pagamentos
+
+# -------- Outros --------
+- label: Outros
+  children:
+    - Permissões
+    - Arquivos
+    - Links
+    - Envio de Email
+
+- label: Permissões
+  prio: 0
+  children:
+    - Contratos
+
+- label: Arquivos
+  prio: 1
+
+- label: Links
+  prio: 3
+  children:
+    - Acessos
+
+- label: Envio de Email
+  prio: 1
+  children:
+    - Templates
+    - Blacklist
+
+- label: Contratos
+  prio: 1
+  children:
+    - Aprovação
+`;
+  </script>
+
+
+  <!-- Deal with DOM -->
+  <script type="text/javascript">
+    var network = null;
+
+    const input = document.getElementById('input');
+    input.value = default_yaml;
+
+    function getInputText() {
+      return input.value;
     }
 
-    function transformTreeToVisData(treeRoot, parentId, nodes, edges, idCounter, color) {
-      if (parentId === void 0) {parentId = -1;}
-      if (nodes === void 0) {nodes = [];}
-      if (edges === void 0) {edges = [];}
-      if (idCounter === void 0) {idCounter = {value: 1};}
+    const input_button = document.getElementById('submit');
+    input_button.addEventListener('click', () => {
+      applyYaml();
+    });
 
-      var nodeId = idCounter.value++;
-      color = toColor(treeRoot) || color;
-      const current_node = {
-        id: nodeId,
-        label: treeRoot.name,
-        color: color,
-      };
+    const theme_button = document.getElementById('theme');
+    theme_button.addEventListener('click', () => {
+      toggleTheme();
+    });
+  </script>
 
-      nodes.push(current_node);
+  <!-- Handle CSS -->
+  <script type="text/javascript">
+    const DARK_COLOR = '#000926';
+    const LIGHT_COLOR = '#fcfcfc';
 
-      // If this node has a parent, create an edge
-      if (parentId !== null) {
-        edges.push({from: parentId, to: nodeId, arrows: 'to'});
+    const root = document.querySelector(':root');
+    const props = root.style;
+
+    var dark_mode = true;
+    setTheme(dark_mode);
+
+    function setTheme(dark) {
+      if (dark === true) {
+        props.setProperty('--background-color', DARK_COLOR);
+        props.setProperty('--color', LIGHT_COLOR);
+      } else {
+        props.setProperty('--background-color', LIGHT_COLOR);
+        props.setProperty('--color', DARK_COLOR);
       }
 
-      // Recursively process children
-      if (treeRoot.children && treeRoot.children.length > 0) {
-        treeRoot.children.forEach(function (childNode) {
-          transformTreeToVisData(childNode, nodeId, nodes, edges, idCounter, color);
-        });
-      }
-      return {nodes: nodes, edges: edges};
+      const theme_button_text = dark ? 'LIGHT' : 'DARK';
+      theme_button.innerText = theme_button_text;
     }
 
-    function setDeps(treeRoot, nodes, edges, cache) {
-      if (treeRoot.children && treeRoot.children.length > 0) {
-        treeRoot.children.forEach(function (childNode) {
-          setDeps(childNode, nodes, edges, cache);
-        });
+    function toggleTheme() {
+      dark_mode = !dark_mode;
+      setTheme(dark_mode);
+    }
+  </script>
+
+  <!-- Parsing the YAML -->
+  <script type="text/javascript">
+    function parseYamlToObject(yaml, finalName) {
+      var rawItems = parseSimpleYaml(yaml);
+      var map = new Map();
+      for (var _i = 0, rawItems_1 = rawItems; _i < rawItems_1.length; _i++) {
+        var item = rawItems_1[_i];
+        map.set(item.label, item);
       }
-
-      if (!treeRoot.deps) {
-        return;
-      }
-
-      const node = nodes.find(f => f.label === treeRoot.name);
-
-      for (const dep of treeRoot.deps) {
-        let dep_node = cache[dep.name];
-        if (!dep_node) {
-          dep_node = nodes.find(f => f.label == dep.name);
-          if (dep_node)
-            cache[dep.name] = dep_node;
+      var resolved = new Map();
+      function resolve(label) {
+        if (resolved.has(label)) {
+          return resolved.get(label);
         }
-        if (!dep_node) {
+        var raw = map.get(label);
+        var prio = !raw || typeof raw.prio === 'undefined' ? undefined : raw.prio;
+        var status = !raw || typeof raw.status === 'undefined' ? undefined : raw.status;
+        var deps = (raw === null || raw === void 0 ? void 0 : raw.deps) || [];
+        var children = (raw === null || raw === void 0 ? void 0 : raw.children) || [];
+        var result = {
+          label: label,
+          status: status,
+          prio: prio,
+          deps: deps.map(function (dep) {return resolve(dep);}),
+          children: children.map(function (child) {return resolve(child);}),
+        };
+        resolved.set(label, result);
+        return result;
+      }
+      return resolve(finalName);
+    }
+    function parseSimpleYaml(yaml) {
+      var _a, _b;
+      var lines = yaml.split('\n');
+      var result = [];
+      var current = null;
+      var currentKey = null;
+      for (var _i = 0, lines_1 = lines; _i < lines_1.length; _i++) {
+        var line = lines_1[_i];
+        if (!line.trim() || line.trim().startsWith('#'))
           continue;
+        var indent = (_b = (_a = line.match(/^ */)) === null || _a === void 0 ? void 0 : _a[0].length) !== null && _b !== void 0 ? _b : 0;
+        line = line.trim();
+        if (line.startsWith('- ')) {
+          if (indent === 0) {
+            if (current)
+              result.push(current);
+            current = {};
+            var kv = line.slice(2).split(':').map(function (s) {return s.trim();});
+            current[kv[0]] = parseValue(kv[1]);
+          }
+          else if (currentKey) {
+            current[currentKey].push(parseValue(line.slice(2)));
+          }
         }
-
-        if (dep_node) {
-          edges.push({from: node.id, to: dep_node.id, arrows: 'to', dashes: true});
-
-          const sep = dep_node.label.indexOf('(');
-          if (sep === -1) {
-            dep_node.label = dep_node.label + ' (1)';
-          } else {
-            console.log(sep, dep_node.label);
-            let qt = parseInt(dep_node.label.substring(sep + 1, dep_node.label.length - 1));
-            console.log(qt);
-            qt++;
-            console.log(qt);
-            dep_node.label = dep_node.label.substring(0, sep - 1) + ` (${qt})`;
+        else {
+          var _c = line.split(':'), key = _c[0], rest = _c.slice(1);
+          var value = rest.join(':').trim();
+          if (value) {
+            current[key] = parseValue(value);
+          }
+          else {
+            current[key] = [];
+            currentKey = key;
           }
         }
       }
+      if (current)
+        result.push(current);
+      return result;
     }
+    function parseValue(val) {
+      if (val === '')
+        return '';
+      if (!isNaN(Number(val)))
+        return Number(val);
+      return val;
+    }
+  </script>
 
-    // Transform your tree data
-    var {nodes: visNodesArray, edges: visEdgesArray} = transformTreeToVisData(stuff);
-    setDeps(stuff, visNodesArray, visEdgesArray, {});
-
-    // Create Vis.js DataSets
-    var nodes = new vis.DataSet(visNodesArray);
-    var edges = new vis.DataSet(visEdgesArray);
-
-    // Provide the data in the vis format
-    var data = {
-      nodes: nodes,
-      edges: edges
+  <!-- Transforming obj into network data -->
+  <script type="text/javascript">
+    function setDeps(item, nodes, edges, cache) {
+      var _a;
+      if (item.children && item.children.length > 0) {
+        item.children.forEach(function (child) {
+          setDeps(child, nodes, edges, cache);
+        });
+      }
+      if (!((_a = item.deps) === null || _a === void 0 ? void 0 : _a.length)) {
+        return;
+      }
+      var item_label = item.label.replace(/ \(\d*\)/g, '');
+      var node = nodes.find(function (f) {return f.label.replace(/ \(\d*\)/g, '') === item_label;});
+      if (!node)
+        return;
+      cache.set(item_label, node);
+      var _loop_1 = function (dep) {
+        var dep_label = dep.label.replace(/ \(\d*\)/g, '');
+        var dep_node = void 0;
+        if (cache.has(dep_label)) {
+          dep_node = cache.get(dep_label);
+        }
+        else {
+          dep_node = nodes.find(function (f) {return f.label.replace(/ \(\d*\)/g, '') === dep_label;});
+          if (dep_node)
+            cache.set(dep_label, dep_node);
+          else
+            return "continue";
+        }
+        edges.push({from: node.id, to: dep_node.id, arrows: 'to', dashes: true});
+        dep_node.value += 5;
+        dep_node.dep_count = (dep_node.dep_count || 0) + 1;
+      };
+      for (var _i = 0, _b = item.deps; _i < _b.length; _i++) {
+        var dep = _b[_i];
+        _loop_1(dep);
+      }
     };
-    var options = {
-      width: '100%',
-      height: '100%',
+    var PURPLE = '#9366ff';
+    var RED = '#ff6686';
+    var ORANGE = '#ff9366';
+    var YELLOW = '#ffe066';
+    var GREEN = '#66ff93';
+    var BLUE = '#66d2ff';
+    function nodeToColor(node) {
+      switch (node.prio) {
+        case -1:
+          return PURPLE;
+        case 0:
+          return RED;
+        case 1:
+          return ORANGE;
+        case 2:
+          return YELLOW;
+        case 3:
+          return GREEN;
+      }
+      if (node.children && node.children.length > 0) {
+        return BLUE;
+      }
     };
+    function parseGraph(final) {
+      var idCounter = 1;
+      function transformTreeToVisData(cache, node, nodes, edges, color, parentId) {
+        var current_node;
+        if (cache.has(node.label)) {
+          current_node = cache.get(node.label);
+        }
+        else {
+          var nodeId = idCounter++;
+          color = nodeToColor(node) || color || PURPLE;
+          current_node = {
+            id: nodeId,
+            label: node.label,
+            color: color,
+            value: 0,
+          };
+          nodes.push(current_node);
+          cache.set(node.label, current_node);
+        }
+        if (parentId !== null) {
+          edges.push({from: parentId, to: current_node.id, arrows: 'to'});
+        }
+        if (node.children && node.children.length > 0) {
+          node.children.forEach(function (childNode) {
+            transformTreeToVisData(cache, childNode, nodes, edges, color, current_node.id);
+          });
+        }
+        return {nodes: nodes, edges: edges};
+      }
+      var _a = transformTreeToVisData(new Map(), final, [], []), nodes = _a.nodes, edges = _a.edges;
+      var set_deps = true;
+      if (set_deps) {
+        setDeps(final, nodes, edges, new Map());
+        for (var _i = 0, nodes_1 = nodes; _i < nodes_1.length; _i++) {
+          var node = nodes_1[_i];
+          if (node.dep_count) {
+            node.label = node.label + ' (' + node.dep_count + ')';
+          }
+        }
+      }
+      return {nodes: nodes, edges: edges};
+    };
+  </script>
 
-    // create a network
-    var container = document.getElementById('mynetwork');
+  <!-- Setup network -->
+  <script type="text/javascript">
+    function applyYaml() {
+      if (network !== null) {
+        network.destroy();
+        network = null;
+      }
 
-    // initialize your network!
-    var network = new vis.Network(container, data, options);
+      const yaml_text = getInputText();
+      const network_data_raw = parseYamlToObject(yaml_text, 'Final');
+      const network_data = parseGraph(network_data_raw, 'Final');
+
+      network_data.nodes[0].fixed = {
+        x: 0,
+        y: 0,
+      };
+
+      const network_options = {
+        nodes: {
+          scaling: {
+            label: {
+              enabled: true,
+              min: 14,
+              max: 25,
+              maxVisible: 20,
+              drawThreshold: 5
+            },
+          },
+        },
+        physics: {
+          barnesHut: {
+            avoidOverlap: .01
+          },
+        },
+      };
+
+      network = new vis.Network(
+        document.getElementById('mynetwork'),
+        network_data,
+        network_options,
+      );
+    }
+  </script>
+
+  <!-- Auto Run -->
+  <script type="text/javascript">
+    applyYaml();
   </script>
 </body>
 
