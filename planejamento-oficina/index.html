@@ -80,17 +80,21 @@
       color: var(--background-color);
     }
 
+    #content-box,
     #mynetwork {
       width: 100%;
       height: 100%;
     }
 
+    #content-box-header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
     #theme {
       display: block;
-      position: absolute;
-      top: 0;
-      right: 0;
-      z-index: 10000000000000;
 
       background-color: var(--color);
       color: var(--background-color);
@@ -98,16 +102,14 @@
 
       font-size: 1.2rem;
       font-weight: bold;
+
+      height: 35px;
 
       padding: .3rem;
     }
 
     #deps {
       display: block;
-      position: absolute;
-      top: 0;
-      right: 0;
-      z-index: 10000000000000;
 
       background-color: var(--color);
       color: var(--background-color);
@@ -116,25 +118,100 @@
       font-size: 1.2rem;
       font-weight: bold;
 
-      padding: .3rem;
+      height: 35px;
 
-      transform: translateX(100%);
+      padding: .3rem;
+    }
+
+    .my-square {
+      width: 35px;
+      height: 35px;
+
+      margin-right: 10px;
+      position: relative;
+      border-radius: 3px;
+    }
+
+    .my-square::before {
+      content: '';
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      width: calc(100% - 8px);
+      height: calc(100% - 8px);
+      border: 4px solid #0004;
+      border-radius: 3px;
+    }
+
+    .my-square.dash::before {
+      border-style: dashed;
+      border-color: var(--color);
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+      font-weight: bold;
+      font-family: monospace;
+    }
+
+    .colors {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+    }
+
+    @media (max-width: 1700px) {
+      .colors {
+        display: none;
+      }
     }
   </style>
 </head>
 
 <body>
-  <button id="theme"></button>
 
   <div id="main">
     <div id="input-box">
-      <button id="deps"></button>
       <textarea id="input"></textarea>
       <div class="input-footer">
         <button id="submit">Aplicar</button>
       </div>
     </div>
-    <div id="mynetwork"></div>
+    <div id="content-box">
+      <div id="content-box-header">
+        <button id="deps"></button>
+        <div class="colors">
+          <div class="item">
+            <div class="my-square" style="background-color: #9366ff;"> </div>
+            raiz
+          </div>
+          <div class="item">
+            <div class="my-square" style="background-color: #ff6686;"> </div>
+            necessário
+          </div>
+          <div class="item">
+            <div class="my-square" style="background-color: #ff9366;"> </div>
+            importante
+          </div>
+          <div class="item">
+            <div class="my-square" style="background-color: #ffe066;"> </div>
+            pode esperar
+          </div>
+          <div class="item">
+            <div class="my-square" style="background-color: #66ff93;"> </div>
+            opcional
+          </div>
+          <div class="item">
+            <div class="my-square dash"></div>
+            dependência
+          </div>
+        </div>
+        <button id="theme"></button>
+      </div>
+      <div id="mynetwork"></div>
+    </div>
   </div>
 
   <!-- Default YAML -->
