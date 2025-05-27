@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <title></title>
+  <style>
+    #mynetwork {
+      width: 100dvw;
+      height: calc(100dvh - 80px);
+    }
+
+    .square {
+      width: 30px;
+      height: 30px;
+      margin-right: 10px;
+      position: relative;
+      border-radius: 3px;
+    }
+
+    .square::before {
+      content: '';
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      width: 22px;
+      height: 22px;
+      border: 4px solid #0004;
+      border-radius: 3px;
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      font-size: 24px;
+      font-weight: bold;
+      font-family: monospace;
+    }
+
+    .colors {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      height: 40px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="colors">
+    <div class="item">
+      <div class="square" style="background-color:#9366ff"></div>
+      todo
+    </div>
+    <div class="item">
+      <div class="square" style="background-color: #ff6686"></div>
+      necessário
+    </div>
+    <div class="item">
+      <div class="square" style="background-color: #ff9366"></div>
+      importante
+    </div>
+    <div class="item">
+      <div class="square" style="background-color: #ffe066"></div>
+      pode esperar
+    </div>
+    <div class="item">
+      <div class="square" style="background-color: #66ff93"></div>
+      opcional
+    </div>
+    <div class="item">
+      <div class="square" style="background-color: #D8D8D8"></div>
+      dependência
+    </div>
+  </div>
+
+  <div id="mynetwork"></div>
+
+  <script>
+    var materiais = {
+      name: 'Materiais', children: [
+        {name: 'Disciplinas'},
+        {name: 'Aulas'},
+        {name: 'Tópicos'},
+        {name: 'Leis'},
+      ], prio: 0
+    };
+    var areas = {
+      name: 'Áreas',
+      children: [{name: 'Objetivos'}],
+      deps: [materiais],
+      prio: 0
+    };
+    var simulados = {
+      name: 'Simulados',
+      children: [{name: 'Questões'}],
+      deps: [areas],
+      prio: 0
+    };
+    var discursivas = {
+      name: 'Discursivas',
+      children: [{name: 'Correção'}],
+      deps: [areas],
+      prio: 0
+    };
+    var flashcards = {
+      name: 'Flashcards',
+      children: [{name: 'Cards'}],
+      deps: [areas],
+      prio: 0
+    };
+    var permissoes = {
+      name: 'Permissões',
+      prio: 0,
+    };
+    var feedbacks = {
+      name: 'Feedbacks',
+      children: [{name: 'Aprovação'}],
+      deps: [areas, simulados, discursivas],
+      prio: 0,
+    };
+    var turmas = {
+      name: 'Turmas',
+      deps: [permissoes],
+      prio: 0,
+    };
+    var produtos = {name: 'Produtos', prio: 2};
+    var vendas = {name: 'vendas', deps: [produtos], prio: 2};
+    var pagamentos = {name: 'pagamentos', deps: [vendas], prio: 2};
+    var aluno_debito = {name: 'alunos em débito', children: [{name: 'por turma'}], deps: [pagamentos], prio: 2};
+    var conteudo_estudo = {
+      name: 'Conteúdo de estudo',
+      children: [
+        areas,
+        simulados,
+        discursivas,
+        flashcards,
+        materiais,
+        {
+          name: 'Cursos',
+          deps: [areas, permissoes],
+          prio: 1,
+        },
+        {
+          name: 'Livros digitais',
+          deps: [areas],
+          prio: 2,
+        },
+        {
+          name: 'Vídeos',
+          deps: [areas],
+          prio: 2,
+        },
+        {name: 'Bancas', prio: 3},
+        {name: 'Mapas mentais', prio: 3},
+      ]
+    };
+    var interacao_usuario = {
+      name: 'Interação com usuário',
+      children: [
+        feedbacks,
+        permissoes,
+        turmas,
+        {name: 'Relatório mensal', deps: [feedbacks], prio: 0},
+        {name: 'Contratos', children: [{name: 'Aprovação'}], deps: [permissoes], prio: 1},
+        {name: 'Dashboard', children: [{name: 'Feedbacks'}], prio: 1},
+        {
+          name: 'Eventos',
+          children: [{name: 'Encontros'}],
+          deps: [turmas, permissoes],
+          prio: 2,
+        },
+        {
+          name: 'Campanhas',
+          children: [{name: 'Inscrições'}],
+          prio: 2,
+        },
+        {name: 'Roda da vida', prio: 2},
+        {name: 'Triade do tempo', prio: 2},
+        {name: 'Teste atenção', prio: 2},
+      ],
+    };
+    var suporte = {
+      name: 'Suporte',
+      children: [
+        {name: 'fale conosco', prio: 1},
+        {name: 'problemas', prio: 1},
+        {name: 'comentários', prio: 2},
+      ],
+    };
+    var marketing = {
+      name: 'Marketing',
+      children: [
+        produtos,
+        vendas,
+        pagamentos,
+        aluno_debito,
+      ],
+    };
+    var outros = {
+      name: 'Outros',
+      children: [
+        {name: 'Links', children: [{name: 'Acessos'}], prio: 3},
+        {name: 'arquivos', prio: 1},
+        {name: 'Envio de email', children: [{name: 'Templates'}, {name: 'Blacklist'}], prio: 1},
+      ],
+    };
+    var stuff = {
+      name: 'todo', children: [
+        conteudo_estudo,
+        interacao_usuario,
+        suporte,
+        marketing,
+        outros,
+      ],
+      prio: -1
+    };
+    function toColor(node) {
+      switch (node.prio) {
+        case -1:
+          return '#9366ff';
+        case 0:
+          return '#ff6686';
+        case 1:
+          return '#ff9366';
+        case 2:
+          return '#ffe066';
+        case 3:
+          return '#66ff93';
+      }
+
+      if (node.children && node.children.length > 0) {
+        return '#66d2ff';
+      }
+    }
+
+    function transformTreeToVisData(treeRoot, parentId, nodes, edges, idCounter, color) {
+      if (parentId === void 0) {parentId = -1;}
+      if (nodes === void 0) {nodes = [];}
+      if (edges === void 0) {edges = [];}
+      if (idCounter === void 0) {idCounter = {value: 1};}
+
+      var nodeId = idCounter.value++;
+      color = toColor(treeRoot) || color;
+      const current_node = {
+        id: nodeId,
+        label: treeRoot.name,
+        color: color,
+      };
+
+      nodes.push(current_node);
+
+      // If this node has a parent, create an edge
+      if (parentId !== null) {
+        edges.push({from: parentId, to: nodeId, arrows: 'to'});
+      }
+
+      // Recursively process children
+      if (treeRoot.children && treeRoot.children.length > 0) {
+        treeRoot.children.forEach(function (childNode) {
+          transformTreeToVisData(childNode, nodeId, nodes, edges, idCounter, color);
+        });
+      }
+      return {nodes: nodes, edges: edges};
+    }
+
+    function setDeps(treeRoot, nodes, edges, cache) {
+      if (treeRoot.children && treeRoot.children.length > 0) {
+        treeRoot.children.forEach(function (childNode) {
+          setDeps(childNode, nodes, edges, cache);
+        });
+      }
+
+      if (!treeRoot.deps) {
+        return;
+      }
+
+      const node = nodes.find(f => f.label === treeRoot.name);
+
+      for (const dep of treeRoot.deps) {
+        let dep_node = cache[dep.name];
+        if (!dep_node) {
+          dep_node = nodes.find(f => f.label == dep.name);
+          if (dep_node)
+            cache[dep.name] = dep_node;
+        }
+        if (!dep_node) {
+          continue;
+        }
+
+        if (dep_node) {
+          edges.push({from: node.id, to: dep_node.id, arrows: 'to', dashes: true});
+
+          const sep = dep_node.label.indexOf('(');
+          if (sep === -1) {
+            dep_node.label = dep_node.label + ' (1)';
+          } else {
+            console.log(sep, dep_node.label);
+            let qt = parseInt(dep_node.label.substring(sep + 1, dep_node.label.length - 1));
+            console.log(qt);
+            qt++;
+            console.log(qt);
+            dep_node.label = dep_node.label.substring(0, sep - 1) + ` (${qt})`;
+          }
+        }
+      }
+    }
+
+    // Transform your tree data
+    var {nodes: visNodesArray, edges: visEdgesArray} = transformTreeToVisData(stuff);
+    setDeps(stuff, visNodesArray, visEdgesArray, {});
+
+    // Create Vis.js DataSets
+    var nodes = new vis.DataSet(visNodesArray);
+    var edges = new vis.DataSet(visEdgesArray);
+
+    // Provide the data in the vis format
+    var data = {
+      nodes: nodes,
+      edges: edges
+    };
+    var options = {
+      width: '100%',
+      height: '100%',
+    };
+
+    // create a network
+    var container = document.getElementById('mynetwork');
+
+    // initialize your network!
+    var network = new vis.Network(container, data, options);
+  </script>
+</body>
+
+</html>
