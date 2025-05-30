@@ -80,6 +80,10 @@
       color: var(--background-color);
     }
 
+    #content-box {
+      position: relative;
+    }
+
     #content-box,
     #mynetwork {
       width: 100%;
@@ -92,6 +96,11 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1000000000000000000;
+      background: transparent;
     }
 
     #theme {
@@ -130,6 +139,7 @@
       margin-right: 10px;
       position: relative;
       border-radius: 3px;
+      background: transparent;
     }
 
     .my-square::before {
@@ -155,6 +165,7 @@
       font-weight: bold;
       font-family: monospace;
       height: 100%;
+      background: transparent;
     }
 
     .colors {
@@ -162,6 +173,7 @@
       gap: 30px;
       justify-content: center;
       height: 100%;
+      background: transparent;
     }
 
     @media (max-width: 1650px) {
