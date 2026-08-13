@@ -201,5 +201,122 @@
   }, 0);
 })();
 </script>
+
+<script>
+(function () {
+  'use strict';
+  var TAU = Math.PI * 2;
+  var items = Array.isArray(window.ITENS) ? window.ITENS : [];
+  var orb = document.getElementById('orb');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var GEOM = { cx: 0, cy: 132, rx: 98, ry: 44, size: 82, lift: 24 };
+  var els = [], ang = 0, vel = 0, target = 0, snapping = false;
+  var drag = false, lastX = 0, moved = 0, sel = -1;
+
+  function build() {
+    orb.innerHTML = '';
+    els = [];
+    items.forEach(function (it, i) {
+      var d = document.createElement('div');
+      d.className = 'oi';
+      d.style.width = GEOM.size + 'px';
+      d.style.height = GEOM.size + 'px';
+      d.innerHTML = '<div class="ph">🎁</div>';
+      if (it.img) {
+        var img = document.createElement('img');
+        img.alt = '';
+        img.addEventListener('error', function () { img.remove(); });
+        img.src = it.img;
+        d.appendChild(img);
+      }
+      d.addEventListener('click', function () {
+        if (moved > 6) return;      // it was a drag, not a tap
+        goTo(i);
+      });
+      orb.appendChild(d);
+      els.push(d);
+    });
+  }
+
+  function goTo(i) {
+    var step = TAU / items.length;
+    var k = Math.round(ang / step), want = -i, best = want, bd = Infinity;
+    for (var t = -2; t <= 2; t++) {
+      var c = want + t * items.length, dd = Math.abs(c - k);
+      if (dd < bd) { bd = dd; best = c; }
+    }
+    target = best * step;
+    if (reduce) { ang = target; snapping = false; } else { snapping = true; }
+    vel = 0;
+  }
+
+  orb.addEventListener('pointerdown', function (e) {
+    drag = true; snapping = false; lastX = e.clientX; vel = 0; moved = 0;
+    orb.setPointerCapture(e.pointerId);
+  });
+  orb.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    var dx = e.clientX - lastX;
+    moved += Math.abs(dx);
+    vel = dx * 0.0042; ang += vel; lastX = e.clientX;
+  });
+  function release() {
+    if (!drag) return;
+    drag = false;
+    if (reduce || Math.abs(vel) < 0.004) {
+      target = WL.snapTarget(ang, items.length);
+      if (reduce) { ang = target; snapping = false; } else { snapping = true; }
+    }
+  }
+  orb.addEventListener('pointerup', release);
+  orb.addEventListener('pointercancel', release);
+
+  function frame() {
+    if (!drag) {
+      if (snapping) {
+        var d = target - ang;
+        ang += d * 0.16;
+        if (Math.abs(d) < 0.0004) { ang = target; snapping = false; }
+      } else if (vel !== 0) {
+        ang += vel; vel *= 0.93;
+        if (Math.abs(vel) < 0.006) { vel = 0; target = WL.snapTarget(ang, items.length); snapping = true; }
+      }
+    }
+    var cur = WL.selectedIndex(ang, items.length);
+    if (cur !== sel) { sel = cur; if (typeof WISH.onSelect === 'function') WISH.onSelect(cur); }
+    for (var i = 0; i < els.length; i++) {
+      var l = WL.layout(ang, i, items.length, GEOM);
+      els[i].style.transform = 'translate(' + l.x.toFixed(1) + 'px,' + l.y.toFixed(1) +
+                               'px) scale(' + l.scale.toFixed(3) + ')';
+      els[i].style.opacity = l.opacity.toFixed(2);
+      els[i].style.zIndex = l.z;
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function resize() { GEOM.cx = orb.clientWidth / 2; }
+  window.addEventListener('resize', resize);
+
+  var WISH = globalThis.WISH;
+  WISH.orbit = {
+    goTo: goTo,
+    selected: function () { return sel; },
+    setTaken: function (i, taken) { if (els[i]) els[i].classList.toggle('taken', !!taken); }
+  };
+
+  var prev = WISH.onReady;
+  WISH.onReady = function () {
+    if (typeof prev === 'function') prev();
+    if (!items.length) {
+      document.getElementById('empty').classList.remove('hidden');
+      document.getElementById('card').style.display = 'none';
+      return;
+    }
+    document.getElementById('total').textContent = items.length;
+    resize(); build(); frame();
+  };
+})();
+</script>
 </body>
 </html>
