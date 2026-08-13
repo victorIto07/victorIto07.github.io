@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Presentes do Vitu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07080f; --fg:#fff; --muted:rgba(255,255,255,.45);
+    --panel:rgba(255,255,255,.07); --line:rgba(255,255,255,.13);
+    --accent:#6d5efc; --accent-soft:#8ea2ff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:"Atkinson Hyperlegible Mono",ui-monospace,monospace}
+  html,body{height:100%}
+  body{
+    background:var(--bg);color:var(--fg);overflow:hidden;
+    -webkit-tap-highlight-color:transparent;
+  }
+  #stage{
+    position:relative;width:100%;height:100dvh;max-width:560px;margin:0 auto;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    overflow:hidden;
+  }
+  #stars{position:absolute;inset:0;pointer-events:none}
+  #glow{position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(ellipse at 50% 30%,rgba(90,120,230,.26),transparent 60%)}
+
+  /* ---- gate ---- */
+  #gate{position:absolute;inset:0;z-index:60;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:14px;padding:28px;
+    background:var(--bg);text-align:center}
+  #gate h1{font-size:22px;letter-spacing:-.02em}
+  #gate p{font-size:13px;color:var(--muted);line-height:1.6;max-width:300px}
+  #gate-input{width:100%;max-width:300px;padding:14px 16px;border-radius:14px;
+    border:1px solid var(--line);background:var(--panel);color:var(--fg);
+    font-size:16px;text-align:center;outline:none}
+  #gate-input:focus{border-color:var(--accent-soft)}
+  #gate-btn{width:100%;max-width:300px;padding:14px;border-radius:14px;border:none;
+    background:var(--accent);color:#fff;font-size:14px;font-weight:800;cursor:pointer}
+  #gate-btn:disabled{opacity:.4;cursor:default}
+  #gate-err{font-size:12px;color:#ff9d7a;min-height:16px}
+  #gate.hidden{display:none}
+
+  /* ---- app ---- */
+  #app{position:absolute;inset:0;z-index:10}
+  #app.hidden{display:none}
+  header{position:absolute;top:0;left:0;right:0;padding:16px 18px 0;z-index:20;
+    display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  header h1{font-size:15px;font-weight:800;letter-spacing:-.01em}
+  header .sub{font-size:11px;color:var(--muted);margin-top:5px}
+  #who{font-size:11px;color:var(--muted);background:none;border:none;
+    cursor:pointer;text-decoration:underline;flex:none}
+  #orb{position:absolute;top:46px;left:0;right:0;height:270px;touch-action:none}
+  #card{position:absolute;left:14px;right:14px;bottom:16px;max-height:238px;
+    overflow-y:auto;padding:17px;border-radius:22px;background:var(--panel);
+    border:1px solid var(--line);backdrop-filter:blur(14px);z-index:15;
+    transition:opacity .17s ease,transform .17s ease}
+  #card::-webkit-scrollbar{width:0}
+  #tag{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-soft)}
+  #nome{font-size:20px;font-weight:800;margin:9px 0 7px;letter-spacing:-.02em;line-height:1.15}
+  #desc{font-size:12.5px;color:rgba(255,255,255,.62);line-height:1.55}
+  #acts{display:flex;gap:8px;margin-top:15px}
+  #acts a,#acts button{flex:1;padding:11px;border-radius:12px;border:none;
+    font-size:12px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none}
+  #loja{background:rgba(255,255,255,.1);color:#fff}
+  #btn{background:var(--accent);color:#fff}
+  #btn.secondary{background:rgba(255,255,255,.13)}
+  #btn.hidden,#loja.hidden{display:none}
+  #empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    padding:30px;text-align:center;font-size:14px;color:var(--muted);z-index:30}
+  #empty.hidden{display:none}
+  #toast{position:absolute;left:50%;bottom:280px;transform:translateX(-50%) translateY(8px);
+    background:rgba(20,20,30,.95);border:1px solid var(--line);color:#fff;
+    padding:10px 16px;border-radius:12px;font-size:12px;z-index:70;
+    opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;white-space:nowrap}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  .oi{position:absolute;border-radius:22px;overflow:hidden;background:#1a1a24;
+    will-change:transform,opacity;cursor:pointer;
+    box-shadow:0 10px 24px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.16)}
+  .oi img{width:100%;height:100%;object-fit:cover;display:block}
+  .oi .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:30px;background:linear-gradient(160deg,#3a3a52,#20202e)}
+  .oi.taken img,.oi.taken .ph{filter:grayscale(1) brightness(.45)}
+  .oi.taken::after{content:'✓';position:absolute;inset:0;display:flex;
+    align-items:center;justify-content:center;font-size:26px;font-weight:800;
+    color:rgba(255,255,255,.85);text-shadow:0 2px 8px rgba(0,0,0,.8)}
+
+  @media (prefers-reduced-motion:reduce){
+    #card{transition:none}
+    #toast{transition:none}
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="stars"></div>
+  <div id="glow"></div>
+
+  <div id="gate">
+    <h1>Quem é você?</h1>
+    <p>Só pra você conseguir desmarcar depois, de qualquer celular. Ninguém vai ver quem reservou o quê — nem eu.</p>
+    <input id="gate-input" type="text" autocomplete="given-name" autocapitalize="words"
+           enterkeyhint="go" placeholder="seu nome" maxlength="40">
+    <div id="gate-err"></div>
+    <button id="gate-btn" disabled>Entrar</button>
+    <p style="font-size:11px">nome e sobrenome, se o seu for comum</p>
+  </div>
+
+  <div id="app" class="hidden">
+    <header>
+      <div>
+        <h1>Presentes do Vitu</h1>
+        <div class="sub"><span id="counter">0</span>/<span id="total">0</span> · <span id="left">0</span> ainda livres</div>
+      </div>
+      <button id="who">trocar nome</button>
+    </header>
+    <div id="orb"></div>
+    <div id="card">
+      <div id="tag">Disponível</div>
+      <div id="nome">—</div>
+      <div id="desc">—</div>
+      <div id="acts">
+        <a id="loja" href="#" target="_blank" rel="noopener">Ver na loja ↗</a>
+        <button id="btn">Vou dar esse!</button>
+      </div>
+    </div>
+    <div id="empty" class="hidden">Nenhum presente na lista ainda.</div>
+  </div>
+
+  <div id="toast"></div>
+</div>
+
+<script src="lib.js"></script>
+<script src="itens.js"></script>
+<script>
+(function () {
+  'use strict';
+  var WISH = (globalThis.WISH = { identity: null });
+
+  var gate = document.getElementById('gate');
+  var input = document.getElementById('gate-input');
+  var btn = document.getElementById('gate-btn');
+  var err = document.getElementById('gate-err');
+  var app = document.getElementById('app');
+
+  // starfield
+  var st = document.getElementById('stars'), h = '';
+  for (var i = 0; i < 48; i++) {
+    h += '<div style="position:absolute;left:' + (Math.random() * 100).toFixed(1) +
+         '%;top:' + (Math.random() * 100).toFixed(1) +
+         '%;width:1.4px;height:1.4px;border-radius:50%;background:rgba(255,255,255,' +
+         (0.15 + Math.random() * 0.5).toFixed(2) + ')"></div>';
+  }
+  st.innerHTML = h;
+
+  function validate() {
+    var ok = WL.normalizeName(input.value).length >= 2;
+    btn.disabled = !ok;
+    return ok;
+  }
+  input.addEventListener('input', function () { err.textContent = ''; validate(); });
+  input.addEventListener('keydown', function (e) { if (e.key === 'Enter') enter(); });
+  btn.addEventListener('click', enter);
+
+  function enter() {
+    var norm = WL.normalizeName(input.value);
+    if (norm.length < 2) { err.textContent = 'Escreve um nome de verdade :)'; return; }
+    try { localStorage.setItem('wishlist:nome', input.value); } catch (e) {}
+    start(input.value, norm);
+  }
+
+  function start(raw, norm) {
+    WISH.identity = { name: raw, key: WL.hashName(norm) };
+    gate.classList.add('hidden');
+    app.classList.remove('hidden');
+    if (typeof WISH.onReady === 'function') WISH.onReady();
+  }
+
+  document.getElementById('who').addEventListener('click', function () {
+    try { localStorage.removeItem('wishlist:nome'); } catch (e) {}
+    location.reload();
+  });
+
+  var saved = null;
+  try { saved = localStorage.getItem('wishlist:nome'); } catch (e) {}
+  /* Deferred to a macrotask on purpose. This script runs while the later
+     <script> blocks are still unparsed, so calling start() synchronously
+     would fire WISH.onReady before the orbit and claims modules have
+     registered theirs — the returning-visitor path would silently render
+     an empty page. */
+  setTimeout(function () {
+    if (saved && WL.normalizeName(saved).length >= 2) {
+      start(saved, WL.normalizeName(saved));
+    } else {
+      input.focus();
+    }
+  }, 0);
+})();
+</script>
+</body>
+</html>
