@@ -41,7 +41,7 @@ window.ITENS = [
   },
   {
     id: 'lata',
-    cor: '#bc795c',
+    cor: '#e70103',
     nome: 'Latinha dos Nóia',
     desc: 'Pra guardar as tralhas soltas que hoje moram no fundo da mochila.<br><span class="grande">YEEESS!</span>',
     img: 'assets/lata.png',
@@ -65,7 +65,7 @@ window.ITENS = [
   },
   {
     id: 'vela',
-    cor: '#d1a68a',
+    cor: '#bc795c',
     nome: 'Vela - Kit Réchaud',
     desc: 'Kit aromático pra aposentar minhas velas. Meu quarto vai ficar <strong>cherozinho</strong> e <i>✨ chique ✨</i>.',
     img: 'assets/vela.png',
