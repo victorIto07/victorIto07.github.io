@@ -105,11 +105,15 @@
   .oi{position:absolute;border-radius:22px;overflow:hidden;background:#1a1a24;
     will-change:transform,opacity;cursor:pointer;
     box-shadow:0 10px 24px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.16)}
-  .oi img{width:100%;height:100%;object-fit:cover;display:block}
+  /* absolute de propósito: o .ph abaixo é posicionado, e elemento posicionado
+     pinta por cima de elemento estático — sem isso o placeholder opaco cobre
+     a foto inteira. */
+  .oi img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:1}
   .oi .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
     font-size:30px;background:linear-gradient(160deg,#3a3a52,#20202e)}
   .oi.taken img,.oi.taken .ph{filter:grayscale(1) brightness(.45)}
-  .oi.taken::after{content:'✓';position:absolute;inset:0;display:flex;
+  /* z-index acima do da <img>, senão o ✓ de reservado fica atrás da foto */
+  .oi.taken::after{content:'✓';position:absolute;inset:0;display:flex;z-index:2;
     align-items:center;justify-content:center;font-size:26px;font-weight:800;
     color:rgba(255,255,255,.85);text-shadow:0 2px 8px rgba(0,0,0,.8)}
 
@@ -266,8 +270,13 @@ window.FIREBASE_CONFIG = {
       d.style.height = GEOM.size + 'px';
       d.innerHTML = '<div class="ph">🎁</div>';
       if (it.img) {
+        var ph = d.querySelector('.ph');
         var img = document.createElement('img');
         img.alt = '';
+        /* Só esconde o placeholder quando a foto chega de verdade. As PNGs têm
+           fundo transparente, então deixar o 🎁 atrás faria ele aparecer por
+           dentro do produto. Se a foto falhar, o placeholder continua lá. */
+        img.addEventListener('load', function () { if (ph) ph.style.display = 'none'; });
         img.addEventListener('error', function () { img.remove(); });
         img.src = it.img;
         d.appendChild(img);
