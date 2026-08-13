@@ -54,7 +54,7 @@ test('hashName never leaks the input', () => {
   assert.ok(!hashName('vitu').includes('vitu'));
 });
 
-const { selectedIndex, snapTarget, layout } = globalThis.WL;
+const { selectedIndex, snapTarget, layout, hexToRgba } = globalThis.WL;
 const TAU = Math.PI * 2;
 
 test('selectedIndex is 0 at rest', () => {
@@ -139,6 +139,35 @@ test('layout keeps scale and opacity within sane bounds', () => {
       assert.ok(l.opacity > 0 && l.opacity <= 1, `opacity ${l.opacity}`);
       assert.ok(Number.isFinite(l.x) && Number.isFinite(l.y));
     }
+  }
+});
+
+test('layout gives the focused item a clear size lead', () => {
+  const g = { cx: 150, cy: 140, rx: 98, ry: 44, size: 82, lift: 24 };
+  const front = layout(0, 0, 9, g).scale;
+  const mid = layout(Math.PI / 2, 0, 9, g).scale;   // depth 0.5
+  // curva convexa: o do meio fica bem abaixo do ponto médio linear (0.70),
+  // senão o item em foco não se destaca dos vizinhos
+  assert.strictEqual(front, 1);
+  assert.ok(mid < 0.66, `meio deveria encolher mais que o linear, veio ${mid}`);
+});
+
+test('hexToRgba converts 6-digit hex', () => {
+  assert.strictEqual(hexToRgba('#5289c6', 0.14), 'rgba(82,137,198,0.14)');
+});
+
+test('hexToRgba accepts no-hash and 3-digit forms', () => {
+  assert.strictEqual(hexToRgba('5289c6', 1), 'rgba(82,137,198,1)');
+  assert.strictEqual(hexToRgba('#abc', 0.5), 'rgba(170,187,204,0.5)');
+});
+
+test('hexToRgba is case insensitive', () => {
+  assert.strictEqual(hexToRgba('#5289C6', 0.14), hexToRgba('#5289c6', 0.14));
+});
+
+test('hexToRgba returns null on garbage so callers can fall back', () => {
+  for (const bad of ['', null, undefined, 'azul', '#12', '#1234567', 42]) {
+    assert.strictEqual(hexToRgba(bad, 0.5), null, `deveria rejeitar ${bad}`);
   }
 });
 

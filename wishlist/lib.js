@@ -49,7 +49,10 @@
   function layout(angle, i, count, geom) {
     var a = angle + i * (TAU / count);
     var depth = (Math.cos(a) + 1) / 2;
-    var scale = 0.48 + depth * 0.52;
+    /* Curva convexa (expoente > 1) em vez de linear: derruba os vizinhos mais
+       rápido do que a distância sugere, então o item em foco fica destacado.
+       Linear deixava todo mundo com tamanho parecido perto da frente. */
+    var scale = 0.40 + 0.60 * Math.pow(depth, 1.5);
     return {
       x: geom.cx + Math.sin(a) * geom.rx - geom.size / 2,
       y: geom.cy - Math.cos(a) * geom.ry - geom.size / 2 - depth * geom.lift,
@@ -59,11 +62,24 @@
     };
   }
 
+  /* Converte a cor do item pra rgba com alpha, pro efeito de vidro da ficha.
+     Devolve null em entrada inválida pra quem chama poder cair num padrão. */
+  function hexToRgba(hex, alpha) {
+    if (typeof hex !== 'string') return null;
+    var h = hex.trim().replace(/^#/, '');
+    if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    if (!/^[0-9a-fA-F]{6}$/.test(h)) return null;
+    return 'rgba(' + parseInt(h.slice(0, 2), 16) + ',' +
+                     parseInt(h.slice(2, 4), 16) + ',' +
+                     parseInt(h.slice(4, 6), 16) + ',' + alpha + ')';
+  }
+
   root.WL = {
     normalizeName: normalizeName,
     hashName: hashName,
     selectedIndex: selectedIndex,
     snapTarget: snapTarget,
-    layout: layout
+    layout: layout,
+    hexToRgba: hexToRgba
   };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

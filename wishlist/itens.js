@@ -16,11 +16,16 @@
    Pra cor livre: <span style="color:#7ee787">verde</span>
    Pra peso: <span class="fina">fininho</span> · <span class="grande">GRANDÃO</span>
 
+   `cor` é a cor do item: tinge o fundo da ficha (efeito vidro) e a borda.
+   Foi tirada automaticamente da foto, mas pode trocar por qualquer hex.
+   Sem `cor`, o item usa o roxo padrão da página.
+
    Só o `desc` aceita HTML — `nome` é texto puro, tag ali aparece escrita.
    E não cole aqui HTML que veio de fora, só o que você mesmo escrever. */
 window.ITENS = [
   {
     id: 'carteira-1',
+    cor: '#d0b18b',
     nome: 'Carteira Yuzu Bege',
     desc: 'Finalmente uma carteira nova! Uso a mesma desde os <strong>12 anos</strong>. A coitada já tá capenga. <span class="fina">Tô enrolando pra trocar há meses.</span>',
     img: 'assets/carteira-1.png',
@@ -28,6 +33,7 @@ window.ITENS = [
   },
   {
     id: 'pochete',
+    cor: '#5289c6',
     nome: 'Pochete Allcatrazes',
     desc: 'Cansei de carregar mochila em rolê.<br><strong>PFV</strong> nas cores "off white encontro" (<span style="color: #faf0e6 !important;">branco</span> e <span style="color: #29639e !important;">azul</span>) ou "<span style="color: #447959 !important;">verde cachoeira</span>"',
     img: 'assets/pochete.png',
@@ -35,6 +41,7 @@ window.ITENS = [
   },
   {
     id: 'lata',
+    cor: '#bc795c',
     nome: 'Latinha dos Nóia',
     desc: 'Pra guardar as tralhas soltas que hoje moram no fundo da mochila.<br><span class="grande">YEEESS!</span>',
     img: 'assets/lata.png',
@@ -42,6 +49,7 @@ window.ITENS = [
   },
   {
     id: 'cartao-doido',
+    cor: '#5c66bc',
     nome: 'Tralha - Tashinami Card',
     desc: 'Um cartão do tamanho de um cartão, cheio de <strong>ferramentinha aleatória</strong>. Vou usar <i>de vez em nunca</i> — mas no dia que eu precisar, vou ser <span class="grande">insuportável</span> sobre isso.',
     img: 'assets/cartao.png',
@@ -49,6 +57,7 @@ window.ITENS = [
   },
   {
     id: 'carteira-cel',
+    cor: '#5cbc87',
     nome: '"Capinha" - Stack Phone Wallet',
     desc: 'Gruda na bundinha do celular e ainda vira apoio. O meu de courinho tá <i>capenga</i>.<br>Todas as cores menos a preta, preferência pra <strong><span style="color: #447959 !important;">verde</span></strong> <span class="fina">rs</span>',
     img: 'assets/capinha.png',
@@ -56,6 +65,7 @@ window.ITENS = [
   },
   {
     id: 'vela',
+    cor: '#d1a68a',
     nome: 'Vela - Kit Réchaud',
     desc: 'Kit aromático pra aposentar minhas velas. Meu quarto vai ficar <strong>cherozinho</strong> e <i>✨ chique ✨</i>.',
     img: 'assets/vela.png',
