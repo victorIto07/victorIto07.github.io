@@ -22,21 +22,21 @@ window.ITENS = [
   {
     id: 'carteira-1',
     nome: 'Carteira Yuzu Bege',
-    desc: 'Finalmente uma carteira nova! 👛 Uso a mesma <strong>desde os 12 anos</strong> — a coitada já deixou de ser acessório e virou <i>documento histórico</i>. <span class="fina">Tô enrolando pra trocar há meses.</span>',
+    desc: 'Finalmente uma carteira nova! Uso a mesma desde os <strong>12 anos</strong>. A coitada já tá capenga. <span class="fina">Tô enrolando pra trocar há meses.</span>',
     img: 'assets/carteira-1.png',
     url: 'https://katsukazan.com.br/produtos/carteira-yuzu-bege'
   },
   {
     id: 'pochete',
     nome: 'Pochete Allcatrazes',
-    desc: 'Cansei de carregar mochila em rolê só pra levar <span class="fina">chave, fone e nada mais</span>.<br><strong>PFV</strong> nas cores "off white encontro" (<span style="color: #faf0e6 !important;">branco</span> e <span style="color: #193d61 !important;">azul</span>) ou "<span style="color: #447959 !important;">verde cachoeira</span>"',
+    desc: 'Cansei de carregar mochila em rolê.<br><strong>PFV</strong> nas cores "off white encontro" (<span style="color: #faf0e6 !important;">branco</span> e <span style="color: #29639e !important;">azul</span>) ou "<span style="color: #447959 !important;">verde cachoeira</span>"',
     img: 'assets/pochete.png',
     url: 'https://allcatrazes.com/products/pochete-allcatrazes-x-brasco'
   },
   {
     id: 'lata',
     nome: 'Latinha dos Nóia',
-    desc: 'Pra guardar as tralhas soltas que hoje moram no fundo da mochila: fone, moeda, isqueiro dos outros e <i>aquilo ali que eu nem sei mais o que é</i>. 🥫<br><span class="grande">YEEESS!</span>',
+    desc: 'Pra guardar as tralhas soltas que hoje moram no fundo da mochila.<br><span class="grande">YEEESS!</span>',
     img: 'assets/lata.png',
     url: 'https://badvibes666.com.br/produtos/latinha-dos-noia-good-but-not-the-best'
   },
@@ -50,14 +50,14 @@ window.ITENS = [
   {
     id: 'carteira-cel',
     nome: '"Capinha" - Stack Phone Wallet',
-    desc: 'Gruda na bundinha do celular e ainda vira apoio. O meu de courinho tá <i>capenga</i> — segura o celular igual eu seguro compromisso.<br>Todas as cores menos a preta, preferência pra <strong><span style="color: #447959 !important;">verde</span></strong> <span class="fina">rs</span>',
+    desc: 'Gruda na bundinha do celular e ainda vira apoio. O meu de courinho tá <i>capenga</i>.<br>Todas as cores menos a preta, preferência pra <strong><span style="color: #447959 !important;">verde</span></strong> <span class="fina">rs</span>',
     img: 'assets/capinha.png',
     url: 'https://www.dailyobjects.us/products/carbon-stack-phone-wallet-stand?variant=52094340071762'
   },
   {
     id: 'vela',
     nome: 'Vela - Kit Réchaud',
-    desc: 'Kit aromático pra aposentar minhas velas. 🕯️ Meu quarto vai ficar <strong>cherozinho</strong> e, pela primeira vez na história, <i>chique</i>.',
+    desc: 'Kit aromático pra aposentar minhas velas. Meu quarto vai ficar <strong>cherozinho</strong> e <i>✨ chique ✨</i>.',
     img: 'assets/vela.png',
     url: 'https://afago.site/produtos/kit-rechaud-com-1-fragrancia'
   }
