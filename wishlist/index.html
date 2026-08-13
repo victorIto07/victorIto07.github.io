@@ -318,5 +318,86 @@
   };
 })();
 </script>
+
+<script>
+(function () {
+  'use strict';
+  var WISH = globalThis.WISH;
+  var items = Array.isArray(window.ITENS) ? window.ITENS : [];
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var card = document.getElementById('card');
+  var elTag = document.getElementById('tag');
+  var elNome = document.getElementById('nome');
+  var elDesc = document.getElementById('desc');
+  var elLoja = document.getElementById('loja');
+  var elBtn = document.getElementById('btn');
+  var elCounter = document.getElementById('counter');
+  var actionFn = null, current = -1, currentState = 'available';
+
+  function paint(i, state) {
+    var it = items[i];
+    if (!it) return;
+    current = i; currentState = state;
+    elNome.textContent = it.nome;
+    elDesc.textContent = it.desc || '';
+    elCounter.textContent = i + 1;
+
+    if (it.url) { elLoja.href = it.url; elLoja.classList.remove('hidden'); }
+    else { elLoja.classList.add('hidden'); }
+
+    if (state === 'available') {
+      elTag.textContent = 'Disponível';
+      elTag.style.color = 'var(--accent-soft)';
+      elBtn.textContent = 'Vou dar esse!';
+      elBtn.classList.remove('hidden', 'secondary');
+    } else if (state === 'mine') {
+      elTag.textContent = '✓ Já reservado';
+      elTag.style.color = 'var(--muted)';
+      elBtn.textContent = 'Foi você — desmarcar';
+      elBtn.classList.remove('hidden');
+      elBtn.classList.add('secondary');
+    } else {
+      elTag.textContent = '✓ Já reservado';
+      elTag.style.color = 'var(--muted)';
+      elBtn.classList.add('hidden');
+    }
+  }
+
+  function render(i, state) {
+    if (i === current) { paint(i, state); return; }   // in-place, no flicker
+    if (reduce) { paint(i, state); card.scrollTop = 0; return; }
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(7px)';
+    setTimeout(function () {
+      paint(i, state);
+      card.scrollTop = 0;
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, 170);
+  }
+
+  elBtn.addEventListener('click', function () {
+    if (actionFn) actionFn(current, currentState);
+  });
+
+  var toastEl = document.getElementById('toast'), toastT = null;
+  WISH.toast = function (msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastT);
+    toastT = setTimeout(function () { toastEl.classList.remove('show'); }, 2600);
+  };
+
+  WISH.card = {
+    render: render,
+    onAction: function (fn) { actionFn = fn; },
+    current: function () { return current; }
+  };
+
+  // Until Task 7 wires Firebase in, every item reads as available.
+  WISH.onSelect = function (i) { render(i, 'available'); };
+})();
+</script>
 </body>
 </html>
