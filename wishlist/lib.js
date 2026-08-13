@@ -58,7 +58,8 @@
       y: geom.cy - Math.cos(a) * geom.ry - geom.size / 2 - depth * geom.lift,
       scale: scale,
       opacity: 0.26 + depth * 0.74,
-      z: Math.round(depth * 100)
+      z: Math.round(depth * 100),
+      depth: depth        // 0 = fundo, 1 = em foco; move o brilho do tile
     };
   }
 

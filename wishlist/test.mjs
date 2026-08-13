@@ -152,6 +152,21 @@ test('layout gives the focused item a clear size lead', () => {
   assert.ok(mid < 0.66, `meio deveria encolher mais que o linear, veio ${mid}`);
 });
 
+test('layout exposes depth so callers can drive focus effects', () => {
+  const g = { cx: 150, cy: 140, rx: 98, ry: 44, size: 82, lift: 24 };
+  assert.strictEqual(layout(0, 0, 9, g).depth, 1);                    // frente
+  assert.ok(Math.abs(layout(Math.PI, 0, 9, g).depth) < 1e-9);         // fundo
+  assert.ok(Math.abs(layout(Math.PI / 2, 0, 9, g).depth - 0.5) < 1e-9); // lado
+});
+
+test('layout depth stays in 0..1 all the way around', () => {
+  const g = { cx: 150, cy: 140, rx: 98, ry: 44, size: 82, lift: 24 };
+  for (let a = -10; a <= 10; a += 0.07) {
+    const d = layout(a, 3, 9, g).depth;
+    assert.ok(d >= 0 && d <= 1, `depth fora de faixa: ${d}`);
+  }
+});
+
 test('hexToRgba converts 6-digit hex', () => {
   assert.strictEqual(hexToRgba('#5289c6', 0.14), 'rgba(82,137,198,0.14)');
 });

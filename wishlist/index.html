@@ -262,12 +262,13 @@ window.FIREBASE_CONFIG = {
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var GEOM = { cx: 0, cy: 132, rx: 98, ry: 44, size: 82, lift: 24 };
-  var els = [], ang = 0, vel = 0, target = 0, snapping = false;
+  var els = [], cores = [], ang = 0, vel = 0, target = 0, snapping = false;
   var drag = false, lastX = 0, moved = 0, sel = -1;
 
   function build() {
     orb.innerHTML = '';
     els = [];
+    cores = [];
     items.forEach(function (it, i) {
       var d = document.createElement('div');
       d.className = 'oi';
@@ -292,6 +293,7 @@ window.FIREBASE_CONFIG = {
       });
       orb.appendChild(d);
       els.push(d);
+      cores.push(it.cor || '#6d5efc');
     });
   }
 
@@ -347,6 +349,20 @@ window.FIREBASE_CONFIG = {
                                'px) scale(' + l.scale.toFixed(3) + ')';
       els[i].style.opacity = l.opacity.toFixed(2);
       els[i].style.zIndex = l.z;
+
+      /* Brilho na cor do item, forte só bem perto da frente. Expoente alto
+         concentra o efeito no item em foco em vez de vazar pros vizinhos.
+         Reservado não brilha — saiu da disputa. */
+      var g = els[i].classList.contains('taken') ? 0 : Math.pow(l.depth, 4);
+      if (g > 0.03) {
+        var cor = cores[i];
+        els[i].style.boxShadow =
+          '0 10px 24px rgba(0,0,0,.55)' +
+          ', inset 0 0 0 ' + (1 + g * 1.6).toFixed(1) + 'px ' + WL.hexToRgba(cor, 0.2 + g * 0.65) +
+          ', 0 0 ' + Math.round(g * 38) + 'px ' + WL.hexToRgba(cor, g * 0.5);
+      } else if (els[i].style.boxShadow) {
+        els[i].style.boxShadow = '';   // volta pro CSS
+      }
     }
     requestAnimationFrame(frame);
   }
