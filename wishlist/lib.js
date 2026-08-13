@@ -33,5 +33,37 @@
     return n.toString(16);
   }
 
-  root.WL = { normalizeName: normalizeName, hashName: hashName };
+  var TAU = Math.PI * 2;
+
+  function selectedIndex(angle, count) {
+    var step = TAU / count;
+    var i = Math.round(-angle / step) % count;
+    return (i + count) % count;
+  }
+
+  function snapTarget(angle, count) {
+    var step = TAU / count;
+    return Math.round(angle / step) * step;
+  }
+
+  function layout(angle, i, count, geom) {
+    var a = angle + i * (TAU / count);
+    var depth = (Math.cos(a) + 1) / 2;
+    var scale = 0.48 + depth * 0.52;
+    return {
+      x: geom.cx + Math.sin(a) * geom.rx - geom.size / 2,
+      y: geom.cy - Math.cos(a) * geom.ry - geom.size / 2 - depth * geom.lift,
+      scale: scale,
+      opacity: 0.26 + depth * 0.74,
+      z: Math.round(depth * 100)
+    };
+  }
+
+  root.WL = {
+    normalizeName: normalizeName,
+    hashName: hashName,
+    selectedIndex: selectedIndex,
+    snapTarget: snapTarget,
+    layout: layout
+  };
 })(typeof globalThis !== 'undefined' ? globalThis : this);
