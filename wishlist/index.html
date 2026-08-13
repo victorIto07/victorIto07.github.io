@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Presentes do Vitu</title>
+<link rel="icon" type="image/png" sizes="32x32" href="/planejamento-oficina/assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/planejamento-oficina/assets/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/planejamento-oficina/assets/apple-touch-icon.png">
+<meta name="theme-color" content="#07080f">
+<meta property="og:title" content="Presentes do Vitu">
+<meta property="og:description" content="minha lista de aniversário 🎁">
+<meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;700;800&display=swap" rel="stylesheet">
@@ -118,7 +125,10 @@
         <h1>Presentes do Vitu</h1>
         <div class="sub"><span id="counter">0</span>/<span id="total">0</span> · <span id="left">0</span> ainda livres</div>
       </div>
-      <button id="who">trocar nome</button>
+      <div style="display:flex;gap:10px;flex:none">
+        <button id="share" style="font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline">compartilhar</button>
+        <button id="who">trocar nome</button>
+      </div>
     </header>
     <div id="orb"></div>
     <div id="card">
@@ -518,6 +528,19 @@ window.FIREBASE_CONFIG = null;
     claims.subscribe(repaint);
     connect();
   };
+
+  document.getElementById('share').addEventListener('click', function () {
+    var data = { title: 'Presentes do Vitu', text: 'minha lista de aniversário 🎁', url: location.href };
+    if (navigator.share) {
+      navigator.share(data).catch(function () {});
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(location.href).then(function () {
+        WISH.toast('Link copiado!');
+      }).catch(function () { WISH.toast(location.href); });
+    } else {
+      WISH.toast(location.href);
+    }
+  });
 })();
 </script>
 </body>
