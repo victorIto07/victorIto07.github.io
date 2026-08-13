@@ -6,62 +6,58 @@
    aparecer como livre. Mudar nome, desc, img e url é sempre seguro.
 
    img e url são opcionais. Sem img aparece um placeholder; sem url o botão
-   "Ver na loja" não aparece. */
+   "Ver na loja" não aparece.
+
+   `desc` aceita HTML. Já tem estilo pronto pra:
+     <strong> destaque   <i>/<em> itálico      <mark> marca-texto roxo
+     <a href>  link (abre em aba nova sozinho) <code> monoespaçado
+     <small> menorzinho  <p> parágrafo         <ul>/<ol>/<li> listas
+     <br> quebra de linha
+   Pra cor livre: <span style="color:#7ee787">verde</span>
+
+   Só o `desc` aceita HTML — `nome` é texto puro, tag ali aparece escrita.
+   E não cole aqui HTML que veio de fora, só o que você mesmo escrever. */
 window.ITENS = [
   {
-    id: 'fone',
-    nome: 'Fone Bluetooth',
-    desc: 'pra eu fingir que não escuto vocês no trabalho',
-    img: 'assets/fone.jpg',
+    id: 'carteira-1',
+    nome: 'Carteira Yuzu Bege',
+    desc: 'Finalmente uma carteira nova! Tenho a minha desde os 12 anos e já tá toda podi. Estou enrolando pra comprar há meses..',
+    img: 'assets/carteira-1.png',
+    url: 'https://katsukazan.com.br/produtos/carteira-yuzu-bege'
+  },
+  {
+    id: 'pochete',
+    nome: 'Pochete Allcatrazes',
+    desc: 'Cansei de usar mochila pra ir nos rolês ! <strong>PFV</strong> cores "off white encontro" (branco e azul) ou "verde cachoeira"',
+    img: 'assets/pochete.png',
+    url: 'https://allcatrazes.com/products/pochete-allcatrazes-x-brasco'
+  },
+  {
+    id: 'lata',
+    nome: 'Latinha dos Nóia',
+    desc: 'Guarda tralha pra deixar na mochila <i>YEEESS!</i>',
+    img: 'assets/lata.png',
     url: ''
   },
   {
-    id: 'livro',
-    nome: 'Livro do Calvino',
-    desc: 'vou colocar na estante e nunca ler, mas fica bonito',
-    img: 'assets/livro.jpg',
+    id: 'cartao-doido',
+    nome: 'Tralha - Tashinami Card',
+    desc: 'Cartão com ferramentas aleatórias (provavelmente vou usar de vez em nunca mas ainda sim é bem legal)',
+    img: 'assets/cartao.png',
     url: ''
   },
   {
-    id: 'caneca',
-    nome: 'Caneca gigante',
-    desc: 'a atual tem uma rachadura que eu chamo de personalidade',
-    img: 'assets/caneca.jpg',
+    id: 'carteira-cel',
+    nome: '"Capinha" - Stack Phone Wallet',
+    desc: 'Cartão pra deixar na bundinha do celular que também serve como apoio (eu já tenho aquele de courinho mas ele tá ficando capenga). Amei todas as cores menos a preta (preferência pra verde rs)',
+    img: 'assets/capinha.png',
     url: ''
   },
   {
-    id: 'planta',
-    nome: 'Planta resistente',
-    desc: 'ênfase no RESISTENTE. já matei quatro, todas com a mesma técnica infalível: regar demais, esquecer por três semanas, regar demais de novo em pânico.',
-    img: 'assets/planta.jpg',
-    url: ''
-  },
-  {
-    id: 'jogo',
-    nome: 'Jogo indie',
-    desc: 'daqueles que eu jogo 2h e falo que é obra-prima',
-    img: 'assets/jogo.jpg',
-    url: ''
-  },
-  {
-    id: 'meia',
-    nome: 'Meia estranha',
-    desc: 'quanto mais feia, mais eu uso. é ciência.',
-    img: 'assets/meia.jpg',
-    url: ''
-  },
-  {
-    id: 'palhetas',
-    nome: 'Kit de palhetas',
-    desc: 'perco todas em 3 dias, é um mistério da física',
-    img: 'assets/palhetas.jpg',
-    url: ''
-  },
-  {
-    id: 'quebracabeca',
-    nome: 'Quebra-cabeça',
-    desc: '1000 peças pra eu montar a borda, sentir orgulho, e guardar na caixa fingindo que foi decisão minha',
-    img: 'assets/quebracabeca.jpg',
+    id: 'vela',
+    nome: 'Vela - Kit Réchaud',
+    desc: 'Kit aromático para substituir as velas. Vai deixar meu quarto cherozinho e <i>chique</i>',
+    img: 'assets/vela.png',
     url: ''
   }
 ];

@@ -71,6 +71,19 @@
   #tag{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-soft)}
   #nome{font-size:20px;font-weight:800;margin:9px 0 7px;letter-spacing:-.02em;line-height:1.15}
   #desc{font-size:12.5px;color:rgba(255,255,255,.62);line-height:1.55}
+  /* desc aceita HTML — estilos pras tags mais úteis */
+  #desc strong,#desc b{color:var(--fg);font-weight:800}
+  #desc em,#desc i{font-style:italic}
+  #desc a{color:var(--accent-soft);text-decoration:underline}
+  #desc code{font-size:11.5px;padding:1px 5px;border-radius:5px;
+    background:rgba(255,255,255,.1);color:var(--fg)}
+  #desc small{font-size:11px;opacity:.75}
+  #desc p{margin:0 0 7px}
+  #desc p:last-child{margin-bottom:0}
+  #desc ul,#desc ol{margin:6px 0 6px 17px}
+  #desc li{margin-bottom:3px}
+  #desc mark{background:rgba(109,94,252,.32);color:var(--fg);
+    padding:0 4px;border-radius:4px}
   #acts{display:flex;gap:8px;margin-top:15px}
   #acts a,#acts button{flex:1;padding:11px;border-radius:12px;border:none;
     font-size:12px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none}
@@ -367,7 +380,14 @@ window.FIREBASE_CONFIG = {
     if (!it) return;
     current = i; currentState = state;
     elNome.textContent = it.nome;
-    elDesc.textContent = it.desc || '';
+    /* HTML on purpose — itens.js is authored by Victor, same trust level as
+       this file. Never point this at anything a visitor can type. */
+    elDesc.innerHTML = it.desc || '';
+    var links = elDesc.getElementsByTagName('a');
+    for (var n = 0; n < links.length; n++) {
+      links[n].target = '_blank';
+      links[n].rel = 'noopener';
+    }
     elCounter.textContent = i + 1;
 
     if (it.url) { elLoja.href = it.url; elLoja.classList.remove('hidden'); }
