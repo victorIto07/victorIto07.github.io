@@ -14,6 +14,7 @@
      <small> menorzinho  <p> parágrafo         <ul>/<ol>/<li> listas
      <br> quebra de linha
    Pra cor livre: <span style="color:#7ee787">verde</span>
+   Pra peso: <span class="fina">fininho</span> · <span class="grande">GRANDÃO</span>
 
    Só o `desc` aceita HTML — `nome` é texto puro, tag ali aparece escrita.
    E não cole aqui HTML que veio de fora, só o que você mesmo escrever. */
@@ -21,43 +22,43 @@ window.ITENS = [
   {
     id: 'carteira-1',
     nome: 'Carteira Yuzu Bege',
-    desc: 'Finalmente uma carteira nova! Tenho a minha desde os 12 anos e já tá toda podi. Estou enrolando pra comprar há meses..',
+    desc: 'Finalmente uma carteira nova! 👛 Uso a mesma <strong>desde os 12 anos</strong> — a coitada já deixou de ser acessório e virou <i>documento histórico</i>. <span class="fina">Tô enrolando pra trocar há meses.</span>',
     img: 'assets/carteira-1.png',
     url: 'https://katsukazan.com.br/produtos/carteira-yuzu-bege'
   },
   {
     id: 'pochete',
     nome: 'Pochete Allcatrazes',
-    desc: 'Cansei de usar mochila pra ir nos rolês ! <strong>PFV</strong> cores "off white encontro" (branco e azul) ou "verde cachoeira"',
+    desc: 'Cansei de carregar mochila em rolê só pra levar <span class="fina">chave, fone e nada mais</span>.<br><strong>PFV</strong> nas cores "off white encontro" (<span style="color: #faf0e6 !important;">branco</span> e <span style="color: #193d61 !important;">azul</span>) ou "<span style="color: #447959 !important;">verde cachoeira</span>"',
     img: 'assets/pochete.png',
     url: 'https://allcatrazes.com/products/pochete-allcatrazes-x-brasco'
   },
   {
     id: 'lata',
     nome: 'Latinha dos Nóia',
-    desc: 'Guarda tralha pra deixar na mochila <i>YEEESS!</i>',
+    desc: 'Pra guardar as tralhas soltas que hoje moram no fundo da mochila: fone, moeda, isqueiro dos outros e <i>aquilo ali que eu nem sei mais o que é</i>. 🥫<br><span class="grande">YEEESS!</span>',
     img: 'assets/lata.png',
-    url: ''
+    url: 'https://badvibes666.com.br/produtos/latinha-dos-noia-good-but-not-the-best'
   },
   {
     id: 'cartao-doido',
     nome: 'Tralha - Tashinami Card',
-    desc: 'Cartão com ferramentas aleatórias (provavelmente vou usar de vez em nunca mas ainda sim é bem legal)',
+    desc: 'Um cartão do tamanho de um cartão, cheio de <strong>ferramentinha aleatória</strong>. Vou usar <i>de vez em nunca</i> — mas no dia que eu precisar, vou ser <span class="grande">insuportável</span> sobre isso.',
     img: 'assets/cartao.png',
-    url: ''
+    url: 'https://www.sousou.co.jp/en-us/products/8511006'
   },
   {
     id: 'carteira-cel',
     nome: '"Capinha" - Stack Phone Wallet',
-    desc: 'Cartão pra deixar na bundinha do celular que também serve como apoio (eu já tenho aquele de courinho mas ele tá ficando capenga). Amei todas as cores menos a preta (preferência pra verde rs)',
+    desc: 'Gruda na bundinha do celular e ainda vira apoio. O meu de courinho tá <i>capenga</i> — segura o celular igual eu seguro compromisso.<br>Todas as cores menos a preta, preferência pra <strong><span style="color: #447959 !important;">verde</span></strong> <span class="fina">rs</span>',
     img: 'assets/capinha.png',
-    url: ''
+    url: 'https://www.dailyobjects.us/products/carbon-stack-phone-wallet-stand?variant=52094340071762'
   },
   {
     id: 'vela',
     nome: 'Vela - Kit Réchaud',
-    desc: 'Kit aromático para substituir as velas. Vai deixar meu quarto cherozinho e <i>chique</i>',
+    desc: 'Kit aromático pra aposentar minhas velas. 🕯️ Meu quarto vai ficar <strong>cherozinho</strong> e, pela primeira vez na história, <i>chique</i>.',
     img: 'assets/vela.png',
-    url: ''
+    url: 'https://afago.site/produtos/kit-rechaud-com-1-fragrancia'
   }
 ];
