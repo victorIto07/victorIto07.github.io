@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <style>
   :root{
     --bg:#07080f; --fg:#fff; --muted:rgba(255,255,255,.45);
@@ -133,6 +135,13 @@
 
   <div id="toast"></div>
 </div>
+
+<script>
+/* Cole aqui a config do seu projeto Firebase. Veja FIREBASE.md.
+   Estas chaves são públicas de propósito — o que protege o banco são as
+   regras de segurança, não elas. Deixe em null pra rodar sem reservas. */
+window.FIREBASE_CONFIG = null;
+</script>
 
 <script src="lib.js"></script>
 <script src="itens.js"></script>
@@ -395,8 +404,120 @@
     current: function () { return current; }
   };
 
-  // Until Task 7 wires Firebase in, every item reads as available.
+  // Overridden by the claims module below once Firebase state is known.
   WISH.onSelect = function (i) { render(i, 'available'); };
+})();
+</script>
+
+<script>
+(function () {
+  'use strict';
+  var WISH = globalThis.WISH;
+  var items = Array.isArray(window.ITENS) ? window.ITENS : [];
+  var claimed = {};             // itemId -> hashedName
+  var subs = [];
+  var db = null, ready = false;
+
+  var claims = {
+    available: false,
+    subscribe: function (fn) { subs.push(fn); fn(claimed); },
+    isMine: function (id) {
+      return !!(WISH.identity && claimed[id] && claimed[id] === WISH.identity.key);
+    },
+    claim: function (id) {
+      if (!db) return Promise.reject(new Error('offline'));
+      return db.ref('claims/' + id).set(WISH.identity.key);
+    },
+    unclaim: function (id) {
+      if (!db) return Promise.reject(new Error('offline'));
+      return db.ref('claims/' + id).remove();
+    }
+  };
+  WISH.claims = claims;
+
+  function fire() { subs.forEach(function (fn) { fn(claimed); }); }
+
+  function connect() {
+    if (!window.FIREBASE_CONFIG || !window.firebase) return degrade();
+    try {
+      firebase.initializeApp(window.FIREBASE_CONFIG);
+      db = firebase.database();
+    } catch (e) { return degrade(); }
+
+    var timer = setTimeout(function () { if (!ready) degrade(); }, 3000);
+    db.ref('claims').on('value', function (snap) {
+      ready = true; clearTimeout(timer);
+      claims.available = true;
+      claimed = snap.val() || {};
+      fire();
+    }, function () { clearTimeout(timer); degrade(); });
+  }
+
+  function degrade() {
+    claims.available = false;
+    db = null;
+    claimed = {};
+    var sub = document.querySelector('header .sub');
+    if (sub && !document.getElementById('offline')) {
+      var s = document.createElement('span');
+      s.id = 'offline';
+      s.textContent = ' · reservas indisponíveis';
+      sub.appendChild(s);
+    }
+    fire();
+  }
+
+  function stateOf(i) {
+    var id = items[i] && items[i].id;
+    if (!id || !claimed[id]) return 'available';
+    return claims.isMine(id) ? 'mine' : 'taken';
+  }
+
+  function repaint() {
+    var free = 0;
+    for (var i = 0; i < items.length; i++) {
+      var taken = !!claimed[items[i].id];
+      if (!taken) free++;
+      WISH.orbit.setTaken(i, taken);
+    }
+    document.getElementById('left').textContent = free;
+    var cur = WISH.card.current();
+    if (cur >= 0) WISH.card.render(cur, stateOf(cur));
+  }
+
+  WISH.onSelect = function (i) { WISH.card.render(i, stateOf(i)); };
+
+  WISH.card.onAction(function (i, state) {
+    var it = items[i];
+    if (!it || !claims.available) { WISH.toast('Reservas indisponíveis agora'); return; }
+    var id = it.id, undo = claimed[id];
+
+    if (state === 'available') {
+      claimed[id] = WISH.identity.key;           // optimistic
+      repaint();
+      claims.claim(id).catch(function () {
+        if (undo === undefined) delete claimed[id]; else claimed[id] = undo;
+        repaint();
+        WISH.toast('Não deu pra reservar. Alguém pegou antes?');
+      });
+    } else if (state === 'mine') {
+      delete claimed[id];                        // optimistic
+      repaint();
+      claims.unclaim(id).catch(function () {
+        claimed[id] = undo;
+        repaint();
+        WISH.toast('Não deu pra desmarcar. Tenta de novo?');
+      });
+    }
+  });
+
+  var prev = WISH.onReady;
+  WISH.onReady = function () {
+    if (typeof prev === 'function') prev();
+    if (!items.length) return;
+    claims.subscribe(repaint);
+    connect();
+  };
 })();
 </script>
 </body>
